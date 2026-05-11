@@ -1,0 +1,98 @@
+services:
+  postgres_user:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: user_db
+      POSTGRES_USER: app
+      POSTGRES_PASSWORD: app
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_user_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U app -d user_db"]
+      interval: 3s
+      timeout: 5s
+      retries: 10
+      start_period: 15s
+
+  postgres_chat:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: chat_db
+      POSTGRES_USER: app
+      POSTGRES_PASSWORD: app
+    ports:
+      - "5434:5432"
+    volumes:
+      - postgres_chat_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U app -d chat_db"]
+      interval: 3s
+      timeout: 5s
+      retries: 10
+      start_period: 15s
+
+  postgres_notif:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: notif_db
+      POSTGRES_USER: app
+      POSTGRES_PASSWORD: app
+    ports:
+      - "5435:5432"
+    volumes:
+      - postgres_notif_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U app -d notif_db"]
+      interval: 3s
+      timeout: 5s
+      retries: 10
+      start_period: 15s
+
+  user-service:
+    build:
+      context: ./services/user_service
+    environment:
+      DATABASE_URL: postgresql+psycopg://app:app@postgres_user:5432/user_db
+      JWT_SECRET: dev-secret-change-me
+      JWT_ALG: HS256
+      ACCESS_TOKEN_EXPIRE_MINUTES: "60"
+    ports:
+      - "8001:8000"
+    depends_on:
+      postgres_user:
+        condition: service_healthy
+
+  notification-service:
+    build:
+      context: ./services/notification_service
+    environment:
+      DATABASE_URL: postgresql+psycopg://app:app@postgres_notif:5432/notif_db
+    ports:
+      - "8003:8000"
+    depends_on:
+      postgres_notif:
+        condition: service_healthy
+
+  chat-service:
+    build:
+      context: ./services/chat_service
+    environment:
+      DATABASE_URL: postgresql+psycopg://app:app@postgres_chat:5432/chat_db
+      JWT_SECRET: dev-secret-change-me
+      JWT_ALG: HS256
+      NOTIFICATION_SERVICE_URL: http://notification-service:8000
+    ports:
+      - "8002:8000"
+    depends_on:
+      postgres_chat:
+        condition: service_healthy
+      notification-service:
+        condition: service_started
+
+volumes:
+  postgres_user_data:
+  postgres_chat_data:
+  postgres_notif_data:
+

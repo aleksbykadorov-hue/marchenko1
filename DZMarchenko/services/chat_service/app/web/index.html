@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Мини‑мессенджер</title>
+    <link rel="stylesheet" href="/static/styles.css" />
+  </head>
+  <body>
+    <div class="wrap">
+      <header class="top">
+        <div>
+          <div class="title">Мини‑мессенджер</div>
+          <div class="muted">UI поверх FastAPI микросервисов</div>
+        </div>
+        <div class="right">
+          <span class="muted" id="meLabel">не авторизован</span>
+          <button class="btn" id="logoutBtn" style="display: none">Выйти</button>
+        </div>
+      </header>
+
+      <main class="grid">
+        <section class="card">
+          <h2>Вход / регистрация</h2>
+          <div class="row">
+            <label>Email</label>
+            <input id="email" placeholder="you@example.com" />
+          </div>
+          <div class="row">
+            <label>Пароль</label>
+            <input id="password" type="password" placeholder="мин. 6 символов" />
+          </div>
+          <div class="actions">
+            <button class="btn primary" id="registerBtn">Регистрация</button>
+            <button class="btn" id="loginBtn">Войти</button>
+          </div>
+          <div class="muted small">
+            Сначала зарегистрируйтесь, затем войдите — токен сохранится в браузере.
+          </div>
+        </section>
+
+        <section class="card">
+          <h2>Чаты</h2>
+          <div class="row">
+            <label>Название чата</label>
+            <input id="chatTitle" placeholder="Например: Группа 1" />
+          </div>
+          <div class="actions">
+            <button class="btn primary" id="createChatBtn">Создать чат</button>
+            <button class="btn" id="refreshChatsBtn">Обновить</button>
+          </div>
+          <div class="list" id="chatsList"></div>
+        </section>
+
+        <section class="card span2">
+          <h2>Сообщения</h2>
+          <div class="actions" id="demoRow" style="margin-bottom: 8px">
+            <button type="button" class="btn" id="demoDialogBtn">
+              Показать демо-диалог (для скриншота)
+            </button>
+            <span class="muted small" style="align-self: center"
+              >Подставляет пример переписки в окно ниже, без сервера</span>
+          </div>
+          <div class="muted small" id="chatHint">Выберите чат слева.</div>
+          <div class="messages" id="messages"></div>
+          <div class="composer">
+            <input id="messageText" placeholder="Введите сообщение..." disabled />
+            <button class="btn primary" id="sendBtn" disabled>Отправить</button>
+          </div>
+        </section>
+      </main>
+
+      <footer class="foot muted small">
+        Сервисы: user-service (8001), chat-service (8002), notification-service (8003)
+      </footer>
+    </div>
+
+    <script src="/static/app.js?v=4"></script>
+  </body>
+</html>
+
